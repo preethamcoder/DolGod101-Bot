@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 from youtube_dl import YoutubeDL
 
@@ -10,7 +11,8 @@ class attributes(commands.Cog):
 
     # 2d array containing [song, channel]
     self.music_queue = []
-    self.YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist':'True'}
+    #self.YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist':'True'}
+    self.YDL_OPTIONS = {'format': 'bestaudio'}
     self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
     self.vc = ""
@@ -61,27 +63,26 @@ class attributes(commands.Cog):
     else:
         self.is_playing = False
 
-  @commands.command(name="play", help="Plays a selected song from youtube", administrator = True)
+  @commands.command(name="p", help="Plays a selected song from youtube", administrator = True)
   async def p(self, ctx, *args):
         query = " ".join(args)
-        
         voice_channel = ctx.author.voice.channel
         if voice_channel is None:
             #you need to be connected so that the bot knows where to go
-            await ctx.send("Connect to a voice channel!")
+            await ctx.send("You gotta join a voice channel first 😤")
         else:
             song = self.search_yt(query)
             if type(song) == type(True):
-                await ctx.send("Could not download the song. Incorrect format try another keyword. This could be due to playlist or a livestream format.")
+                await ctx.send("Could not download the song. Incorrect format, please try another keyword. This could be due to playlist or a livestream format.")
             else:
-                await ctx.send("Song added to the queue")
+                await ctx.send("Song's been added, mate!")
                 self.music_queue.append([song, voice_channel])
                 
                 if self.is_playing == False:
                     await self.play_music()
 
-  @commands.command(name="queue", help="Displays the current songs in queue", administrator = True)
-  async def q(self, ctx):
+  @commands.command(name="q", help="Displays the current songs in queue", administrator = True)
+  async def queue(self, ctx):
         retval = ""
         for i in range(0, len(self.music_queue)):
             retval += self.music_queue[i][0]['title'] + "\n"
@@ -90,11 +91,14 @@ class attributes(commands.Cog):
         if retval != "":
             await ctx.send(retval)
         else:
-            await ctx.send("No music in queue")
+            await ctx.send("Nothin' in here, mate!")
 
   @commands.command(name="skip", help="Skips the current song being played", administrator = True)
   async def skip(self, ctx):
         if self.vc != "" and self.vc:
             self.vc.stop()
-            #try to play next in the queue if it exists
             await self.play_music()
+  
+  @commands.command(name="dc", help="Kicks the bot outta the voice chat", administrator = True)
+  async def dc(self, ctx):
+    await ctx.disconnect()

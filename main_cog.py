@@ -12,7 +12,7 @@ Music commands:
 >p <keywords> - finds the song on youtube and plays it in your current channel
 >q - displays the current music queue
 >skip - skips the current song being played
->dc - leaves the voice channel and stops playing all the songs
+>dc - leaves the voice channel and stops playing all the songs #please use this with care, as this is a mal-functioning command!
 ```
 """
         self.text_channel_list = []
