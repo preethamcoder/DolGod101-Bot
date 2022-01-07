@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "Multi-purpose Bot Real"
-version = "0.0.2"
+name = "DolGod101"
+version = "0.1.0"
 description = "This is a bot that can do many things. However, it only plays music for now. Will add more features as time passes."
 authors = ["Preetham Thelluri <preetham23415@gmail.com>"]
 
