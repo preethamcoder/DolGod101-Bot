@@ -1,0 +1,9 @@
+discord==1.7.3
+Flask==2.0.1
+youtube_dl==2021.12.17
+PyNaCl==1.4.0
+ffmpeg-python
+ffmpeg
+BeautifulSoup
+bs4
+
