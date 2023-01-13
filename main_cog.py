@@ -1,5 +1,7 @@
 from discord.ext import commands
 import random
+import requests
+from bs4 import BeautifulSoup
 
 class main_cog(commands.Cog):
     def __init__(self, bot):
@@ -11,21 +13,24 @@ class main_cog(commands.Cog):
         self.help_message = """
 ```
 General commands:
->help - displays all the available commands
->clear amount - will delete the past messages with the amount specified
+=>help - displays all the available commands
+=>clear amount - will delete the past messages with the amount specified
 Spiritual connect:
->thought - randomly displays a cool thought 😎
+=>thought - randomly displays a cool thought 😎
 Music commands:
->p <keywords> - finds the song on youtube and plays it in your current channel
->q - displays the current music queue
->skip - skips the current song being played
->dc - leaves the voice channel and stops playing all the songs
+=>p <keywords> - finds the song on youtube and plays it in your current channel
+=>q - displays the current music queue
+=>skip - skips the current song being played
+=>dc - leaves the voice channel and stops playing all the songs
 Fun section:
->sh_roast - light-heartedly roasts the tagged person in Shakespearnean English. Caution: THIS CAN BE EXTREMELY OFFENSIVE 😲😲
->roast - randomly roasts the tagged person in *REGULAR* English; the dataset is realtively small now, so there aren't many roasts out there
+=>sh_roast - light-heartedly roasts the tagged person in Shakespearnean English. Caution: THIS CAN BE EXTREMELY OFFENSIVE 😲😲
+=>roast - randomly roasts the tagged person in *REGULAR* English; the dataset is realtively small now, so there aren't many roasts out there
+=>cric - brings you the latest updates from cricket games around the world
 ```
 """
         self.text_channel_list = []
+
+    
 
     #some debug info so that we know the bot has started          
     @commands.command(name="help", help="Displays all the available commands")
@@ -64,10 +69,22 @@ Fun section:
     async def roast(self, ctx):
         members = ctx.message.mentions
         if(len(members) == 0):
-            await ctx.send(f"I don't know who to roast, {ctx.author.mention}")
+            await ctx.send(f"```I don't know who to roast,``` {ctx.author.mention}")
         else:
             mes = ''
             for ind in range(len(members)):
                 r_ind = random.randint(0, len(self.roasts)-1)
                 mes += f"{members[ind].mention} " + self.roasts[r_ind] + '\n\n'
             await ctx.send(mes)
+
+    @commands.command(name="cric", help="brings you cricket action from cricbuzz")
+    async def cric(self, ctx):
+      url = "https://www.cricbuzz.com"
+      res = requests.get(url)
+      soup = BeautifulSoup(res.content, 'html5lib')
+      data = soup.find_all('li', attrs = {'class': 'cb-col cb-col-25 cb-mtch-blk cb-vid-sml-card-api videos-carousal-item cb-carousal-item-large cb-view-all-ga'})
+      mes = ''
+      for each in data:
+        match = each.text.strip()
+        mes += match + '\n\n'
+      await ctx.send(mes)
