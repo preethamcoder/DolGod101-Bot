@@ -30,9 +30,6 @@ Fun section:
 """
         self.text_channel_list = []
 
-    
-
-    #some debug info so that we know the bot has started          
     @commands.command(name="help", help="Displays all the available commands")
     async def help(self, ctx):
         await ctx.send(self.help_message)
@@ -55,7 +52,7 @@ Fun section:
     async def sh_roast(self, ctx):
         members = ctx.message.mentions
         if(len(members) == 0):
-            await ctx.send(f"I don't know who to roast, {ctx.author.mention}")
+            await ctx.send(f"```I don't know who to roast,``` {ctx.author.mention}")
         else:
             mes = ''
             for ind in range(len(members)):
