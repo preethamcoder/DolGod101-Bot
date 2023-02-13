@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 from youtube_dl import YoutubeDL
 import random
+import requests
+import json
 
 class attributes(commands.Cog):
   def __init__(self, bot):
@@ -27,9 +29,9 @@ class attributes(commands.Cog):
      #searching the item on youtube
   def search_yt(self, item):
         with YoutubeDL(self.YDL_OPTIONS) as ydl:
-            try: 
+            try:
                 info = ydl.extract_info("ytsearch:%s" % item, download=False)['entries'][0]
-            except Exception: 
+            except Exception:
                 return False
 
         return {'source': info['formats'][0]['url'], 'title': info['title']}
@@ -48,20 +50,20 @@ class attributes(commands.Cog):
       else:
           self.is_playing = False
 
-    # infinite loop checking 
+    # infinite loop checking
   async def play_music(self):
     if len(self.music_queue) > 0:
         self.is_playing = True
 
         m_url = self.music_queue[0][0]['source']
-        
+
         #try to connect to voice channel if you are not already connected
 
         if self.vc == "" or not self.vc.is_connected() or self.vc == None:
             self.vc = await self.music_queue[0][1].connect()
         else:
             await self.vc.move_to(self.music_queue[0][1])
-        
+
         print(self.music_queue)
         #remove the first element as you are currently playing it
         self.music_queue.pop(0)
@@ -69,8 +71,7 @@ class attributes(commands.Cog):
         self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
     else:
         self.is_playing = False
-  
-  
+
   @commands.command(name="p", help="Plays a selected song from youtube", administrator = True)
   async def p(self, ctx, *args):
         query = " ".join(args)
@@ -89,7 +90,7 @@ class attributes(commands.Cog):
             else:
                 await ctx.send(f"{ctx.author.name}, your song's been added, mate!")
                 self.music_queue.append([song, voice_channel])
-                
+
                 if self.is_playing == False:
                     await self.play_music()
 
@@ -98,8 +99,6 @@ class attributes(commands.Cog):
         retval = ""
         for index in range(0, len(self.music_queue)):
             retval += self.music_queue[index][0]['title'] + "\n"
-
-        print(retval)
         if retval != "":
             await ctx.send(retval)
         else:
@@ -110,12 +109,17 @@ class attributes(commands.Cog):
         if self.vc != "" and self.vc:
             self.vc.stop()
             await self.play_music()
-  
+
   @commands.command(name="thought", help="Randomly throws some knowledge out 😂", administrator = True)
   async def thought(self, ctx):
-    lim = len(self.thoughts)
-    ind = random.randint(0, lim-1)
-    await ctx.send(self.thoughts[ind])
+    verses = {2:72, 3:50, 4:42, 5:29, 6:47, 7:30, 8:28, 9:34, 10:42, 11:55, 12:20, 13:34, 14:27, 15:20, 16:24, 17:28, 18:78}
+    chaps = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    chapter = random.choice(chaps)
+    verse = random.randrange(1, verses[chapter]+1)
+    url = f"https://bhagavadgitaapi.in/slok/{chapter}/{verse}"
+    res = requests.request("GET", url)
+    res_real = json.loads(res.text)
+    await ctx.send("```"+res_real['siva']['et']+"```")
     
   @commands.command(name="dc", help="Kicks the bot outta the voice chat", administrator = True)
   async def dc(self, ctx):
